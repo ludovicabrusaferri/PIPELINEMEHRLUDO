@@ -9,8 +9,11 @@ makecope_suv_mni_5mm() {
     local processing_dir="${PET_dir_skull}/${subj}/PET/SUVR_2mm-processing_ANTs"
     local stats_dir="${PET_dir_skull}/FSL_analyses_ANTs_nativeNoBrain/stats"
     local smoothed_output="${processing_dir}/${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
- 
-    mkdir -p $stats_dir
+    local cope_output="${stats_dir}/cope1_${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
+    local varcope_output="${stats_dir}/varcope1_${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
+
+    # Ensure necessary directories exist
+    mkdir -p "$stats_dir"
 
     # Ensure processing directory exists
     [[ ! -d "$processing_dir" ]] && { echo -e "\e[31mError: Processing directory does not exist: $processing_dir\e[0m"; return 1; }
@@ -23,24 +26,32 @@ makecope_suv_mni_5mm() {
         return 1
     fi
 
-    # Apply Gaussian smoothing (5mm FWHM)
-    echo "Smoothing SUV Skull image with 5mm FWHM Gaussian kernel..."
-    fslmaths "${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain.nii.gz" \
-             -kernel gauss 2.12 -fmean "$smoothed_output" -odt float
+    # Apply Gaussian smoothing (5mm FWHM) only if output doesn't exist
+    if [[ ! -f "$smoothed_output" ]]; then
+        echo "Smoothing SUV Skull image with 5mm FWHM Gaussian kernel..."
+        fslmaths "${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain.nii.gz" \
+                 -kernel gauss 2.12 -fmean "$smoothed_output" -odt float
+        echo "Finished smoothing: $smoothed_output"
+    else
+        echo "Smoothed file already exists. Skipping smoothing."
+    fi
 
-    echo "Finished smoothing: $smoothed_output"
+    # Copy the smoothed file to the stats directory as cope1 file if it doesn't already exist
+    if [[ ! -f "$cope_output" ]]; then
+        cp "$smoothed_output" "$cope_output"
+        echo "Copied smoothed file to stats directory as cope1."
+    else
+        echo "cope1 file already exists. Skipping copy."
+    fi
 
+    # Create varcope1 file (binary mask) only if it doesn't exist
+    if [[ ! -f "$varcope_output" ]]; then
+        echo "Creating varcope1 binary mask..."
+        fslmaths "$smoothed_output" -bin "$varcope_output"
+    else
+        echo "varcope1 file already exists. Skipping creation."
+    fi
 
-    # Copy the smoothed file to the MNI directory
-    cp "$smoothed_output" "$processing_dir/${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
-
-    # Copy to stats directory as cope1 file
-    cp "$smoothed_output" "$stats_dir/cope1_${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
-
-    # Create varcope1 file (binary mask)
-    echo "Creating varcope1 binary mask..."
-    fslmaths "$smoothed_output" -bin "$stats_dir/varcope1_${subj}_SUV_nl_MNI152_Linterp-WHmaskNativ_Nodil_Bone_NoBrain_sm5mm.nii.gz"
-
-    echo "Completed processing for subject: $subj"
+    echo -e "\e[32mCompleted processing for subject: $subj\e[0m"
 }
 

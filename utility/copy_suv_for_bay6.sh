@@ -12,23 +12,15 @@ copy_suv_for_bay6() {
     local pet_dir="${subject_dir}/PET"
     local target_file_orig="${pet_dir}/PET_60-90_SUV_orig.nii"
     local target_file="${pet_dir}/PET_60-90_SUV.nii"
+    local target_file_gz="${pet_dir}/PET_60-90_SUV.nii.gz"
 
     # Debugging: Print paths
     echo "Source file: $filename"
     echo "Original target file: $target_file_orig"
-    echo "Final target file: $target_file"
+    echo "Final target file: $target_file_gz"
 
-    # Ensure the subject directory exists
-    if [[ ! -d "$subject_dir" ]]; then
-        mkdir -p "$subject_dir"
-        echo "Created subject directory: $subject_dir"
-    fi
-
-    # Ensure the PET directory exists
-    if [[ ! -d "$pet_dir" ]]; then
-        mkdir -p "$pet_dir"
-        echo "Created PET directory: $pet_dir"
-    fi
+    # Ensure directories exist
+    mkdir -p "$subject_dir" "$pet_dir"
 
     # Ensure the source PET file exists
     if [[ ! -f "$filename" ]]; then
@@ -36,28 +28,42 @@ copy_suv_for_bay6() {
         return 1
     fi
 
-    # If the final compressed target file already exists, skip copying
-    if [[ -f "$target_file" ]]; then
-        echo "File already exists for $subj. Skipping copy."
-        PETinputfile="$target_file"
+    # Check if the final gzipped PET file already exists
+    if [[ -f "$target_file_gz" ]]; then
+        echo "PET file already exists for $subj. Skipping processing."
+        PETinputfile="$target_file_gz"
         export PETinputfile
         return 0
     fi
 
-    # Copy the source file to the original target location
-    cp "$filename" "$target_file_orig"
+    # If the original file is missing, copy it
+    if [[ ! -f "$target_file_orig" ]]; then
+        echo "Copying original PET file..."
+        cp "$filename" "$target_file_orig"
+    else
+        echo "Original PET file already exists. Skipping copy."
+    fi
 
-    # Perform left-right flipping using mri_convert
-    mri_convert --left-right-reverse-pix "$target_file_orig" "$target_file"
+    # If the converted file is missing, perform left-right flipping
+    if [[ ! -f "$target_file" ]]; then
+        echo "Performing left-right flipping using mri_convert..."
+        mri_convert --left-right-reverse-pix "$target_file_orig" "$target_file"
+    else
+        echo "Left-right flipped PET file already exists. Skipping conversion."
+    fi
 
-    # Compress the final file
-    gzip -f "$target_file"
+    # If the compressed file is missing, compress it
+    if [[ ! -f "$target_file_gz" ]]; then
+        echo "Compressing PET file..."
+        gzip -f "$target_file"
+    else
+        echo "Compressed PET file already exists. Skipping compression."
+    fi
 
     # Set PETinputfile to the final output file
-    PETinputfile="${target_file}.gz"
+    PETinputfile="$target_file_gz"
     export PETinputfile
 
-    echo "PET file copied, converted, and compressed for bay6 subject: $subj"
+    echo "Final PET file for bay6 subject $subj: $PETinputfile"
 }
-
 

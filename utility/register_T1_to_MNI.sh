@@ -3,7 +3,7 @@
 register_T1_to_MNI() {
     local subj="$1"
     local PET_dir_skull="$2"
-    local path_mni=/autofs/cluster/pubsw/2/pubsw/Linux2-2.3-x86_64/packages/fsl.64bit/6.0.5.1/data/standard
+    local path_mni="/autofs/cluster/pubsw/2/pubsw/Linux2-2.3-x86_64/packages/fsl.64bit/6.0.5.1/data/standard"
 
     echo "Running ANTs T1 to MNI for subject: $subj"
 
@@ -25,14 +25,22 @@ register_T1_to_MNI() {
 
     echo "Registering T1 to MNI using ANTs for subject ${subj}"
 
-    # Run ANTs registration if output file doesn't exist
-    if [[ ! -f "${subj}_T1_MNI.nii.gz" ]]; then
-        echo "ANTs is running for $subj..."
-        antsRegistration -d 3 -v 1 -o [${subj}, ${subj}_T1_MNI.nii.gz, ${subj}_MNI_T1.nii.gz] \
-                         -r [${fixed_MNI}, T1_orientOK.nii.gz, 0] \
-                         ${AffineParameters} ${DeformParameters}
-    else
-        echo "ANTs has already been run for $subj."
+    # Define output file paths
+    local output_file_T1_MNI="${processing_dir}/${subj}_T1_MNI.nii.gz"
+    local output_file_MNI_T1="${processing_dir}/${subj}_MNI_T1.nii.gz"
+    local output_prefix="${processing_dir}/${subj}"
+
+    # Skip ANTs registration if both output files already exist
+    if [[ -f "$output_file_T1_MNI" && -f "$output_file_MNI_T1" ]]; then
+        echo "ANTs registration has already been completed for $subj. Skipping processing."
+        return 0
     fi
+
+    echo "Running ANTs registration for $subj..."
+    antsRegistration -d 3 -v 1 -o ["$output_prefix", "$output_file_T1_MNI", "$output_file_MNI_T1"] \
+                     -r ["$fixed_MNI", "T1_orientOK.nii.gz", 0] \
+                     ${AffineParameters} ${DeformParameters}
+
+    echo -e "\e[32mANTs registration completed successfully for subject $subj.\e[0m"
 }
 

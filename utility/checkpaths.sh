@@ -25,6 +25,11 @@ check_paths() {
         fi
         bay7="False"
 
+     elif [[ "$subj" == *"ppg"*"hv"* ]]; then
+         datapath="/autofs/space/storm_001/users/migPPG/data/PETdata"
+	 fs_dir="/autofs/space/storm_001/users/migPPG/data/fs"
+        bay7="False"
+
     else
         echo "No PET data available for $subj" >&2
         return 1
