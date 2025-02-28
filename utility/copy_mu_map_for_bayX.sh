@@ -14,12 +14,15 @@ copy_mu_map_for_bayX() {
     echo "Processing muMAP for subject: $subj (Bay7: $bay7)"
 
     if [[ "$bay7" == "True" ]]; then
+	echo $convert_dir
+	echo $convert_dir2
         # For bay7: Handling the muMAP retrieval and copying
         if [[ -d ${convert_dir}/*${subj}* && -f ${convert_dir}/*${subj}*/${mumap} ]]; then
             cd ${convert_dir}/*${subj}*
             echo "muMAP is located at ${PWD}"
 
-        elif [[ -d ${convert_dir2}/*${subj}* && -f ${convert_dir2}/*${subj}*/*-Converted/30001Head_PetAcquisition_Raw_Data-LM-00/${mumap} ]]; then
+        elif [[ -d ${convert_dir2}/${subj} ]]; then
+	echo I AM HERE
             cd ${convert_dir2}/*${subj}*/*-Converted/30001Head_PetAcquisition_Raw_Data-LM-00
             echo "muMAP is located at ${PWD}"
         else

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-convert_to_suv() {
+suv_convert() {
     local subj="$1"
     local PET_dir_skull="$2"
     local e7_dir="$3"
