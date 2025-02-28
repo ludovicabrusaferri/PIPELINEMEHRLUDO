@@ -43,7 +43,8 @@ suv_convert() {
     echo "Running SUV conversion using fslmaths..."
     fslmaths "${PET_dir_skull}/${subj}/PET/PET_60-90.nii.gz" \
         -div "$dose" -div 37000000 -mul "$weight" -mul 1000 "$suv_file"
-
+     PETinputfile=$suv_file
+    export PETinputfile
     echo "SUV conversion completed for subject: $subj"
 }
 

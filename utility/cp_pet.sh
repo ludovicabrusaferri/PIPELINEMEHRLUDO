@@ -16,8 +16,8 @@ cp_pet() {
      
         echo "Found PET file: $file_path"
      cp $file_path ${PET_dir_skull}/${subj}/PET/$pet_filename
-    PETinputfile=${PET_dir_skull}/${subj}/PET/$pet_filename
-    export PETinputfile
+    #PETinputfile=${PET_dir_skull}/${subj}/PET/$pet_filename
+    #export PETinputfile
  
     
 }
