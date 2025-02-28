@@ -38,7 +38,7 @@ while IFS= read -r subj; do
     [[ "$bay7" == "False" ]] && copy_suv_for_bay6 "$subj" "$PET_dir_skull" "$filename"
     
     # STEP 2 ============ i only tested this for bay6
-    copy_mu_map_for_bayX "$subj" "$PET_dir_skull" "$convert_dir" "$convert_dir2" "$datapath" "False"
+    copy_mu_map_for_bayX "$subj" "$PET_dir_skull" "$convert_dir" "$convert_dir2" "$datapath" "$bay7"
 
     # FROM NOW ON EVERYTHING IS THE SAME IN BOTH BAYS 
 
