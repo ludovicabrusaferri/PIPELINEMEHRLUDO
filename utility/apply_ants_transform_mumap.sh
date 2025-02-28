@@ -26,6 +26,7 @@ apply_ants_transform_mumap() {
     # Convert LTA to ITK format only if needed
     [[ ! -f "${subj}_suv_lin-coreg2_T1.txt" ]] && lta_convert --inlta "${subj}_suv_lin-coreg2_T1.lta" --outitk "${subj}_suv_lin-coreg2_T1.txt"
 
+    mri_vol2vol --mov PET_60-90_SUV_orientOK.nii.gz --targ T1_orientOK.nii.gz --o ${subj}_suv_lin-coreg2_T1_QCimage.nii.gz --reg ${subj}_suv_lin-coreg2_T1.lta --interp nearest
     # Apply ANTs transformation
     antsApplyTransforms -d 3 -e 0 -i gated_muMAP_th_BIN_Nodil_Nativ_NoBrain.nii.gz \
                         -r ${subj}_T1_MNI.nii.gz -o "$output_file" \
@@ -33,5 +34,6 @@ apply_ants_transform_mumap() {
                         -t ${subj}_suv_lin-coreg2_T1.txt -v 1 -n NearestNeighbor
 
     echo "Finished ANTs transformation for muMAP: $output_file"
+     
 }
 
