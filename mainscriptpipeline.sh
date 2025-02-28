@@ -2,7 +2,7 @@
 
 # Define main paths
 PET_dir_origin="/autofs/space/storm_002/users/MigPPG_2/data/PETdata/"
-subjlistpath="/autofs/space/edna_002/users/Mehrbod/Skull_TSPO/Scripts/LUDOCODE"
+subjlistpath="$PWD"
 PET_dir_skull="/autofs/space/storm_002/users/MigPPG_2/data/PETdata/SKULL/"
 convert_dir="/path/to/convert_dir"  # Update this path accordingly
 
@@ -35,24 +35,24 @@ while IFS= read -r subj; do
     [[ "$bay7" == "True" ]] && cp_pet "$subj" "$PET_dir_skull" "$PET_dir_origin" "$convert_dir" "$bay7"
     [[ "$bay7" == "True" ]] && suv_convert "$subj" "$PET_dir_skull" "$e7_dir" "$dose_weight"
     # STEP 1 bay6 ============  IMPORTANT: for bay6 we also perfom right-left flipping to both PET and mu-map 
-    #[[ "$bay7" == "False" ]] && copy_suv_for_bay6 "$subj" "$PET_dir_skull" "$filename"
+    [[ "$bay7" == "False" ]] && copy_suv_for_bay6 "$subj" "$PET_dir_skull" "$filename"
     
     # STEP 2 ============ i only tested this for bay6
-    #copy_mu_map_for_bayX "$subj" "$PET_dir_skull" "$convert_dir" "$convert_dir2" "$datapath" "False"
+    copy_mu_map_for_bayX "$subj" "$PET_dir_skull" "$convert_dir" "$convert_dir2" "$datapath" "False"
 
     # FROM NOW ON EVERYTHING IS THE SAME IN BOTH BAYS 
 
     # STEP 3 ============ .. making fun stuff
-    #mkdir -p "$PET_dir_skull/$subj/PET/SUVR_2mm-processing_ANTs/" && process_files "$subj" "$fs_dir" "$PET_dir_skull" "$bay7" "$PETinputfile"
+    mkdir -p "$PET_dir_skull/$subj/PET/SUVR_2mm-processing_ANTs/" && process_files "$subj" "$fs_dir" "$PET_dir_skull" "$bay7" "$PETinputfile"
     
     # STEP 4 ============ .. making more fun stuff
-    #process_nativ_mu "$subj" "$PET_dir_skull"
+    process_nativ_mu "$subj" "$PET_dir_skull"
     # STEP 5 =========== ANTS
-    #register_T1_to_MNI "$subj" "$PET_dir_skull"
+    register_T1_to_MNI "$subj" "$PET_dir_skull"
     # STEP 6 ===========  Apply ANTs transformation to muMAP
-    #apply_ants_transform_mumap "$subj" "$PET_dir_skull"
+    apply_ants_transform_mumap "$subj" "$PET_dir_skull"
     # STEP 7 ===========  Apply ANTs transformation to Skull SUV
-    #apply_ants_transform_suv "$subj" "$PET_dir_skull"
+    apply_ants_transform_suv "$subj" "$PET_dir_skull"
     # STEP 8 ====== Apply 5mm Gaussian smoothing and process Skull SUV in MNI space
     makecope_suv_mni_5mm "$subj" "$PET_dir_skull"
 
