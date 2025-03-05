@@ -51,7 +51,7 @@ copy_mu_map_for_bayX() {
             
             [[ ! -f "$gated_mumap_orig" ]] && cp "$bay6_filepath" "$gated_mumap_orig"
 
-            [[ ! -f "$gated_mumap" ]] && mri_convert --left-right-reverse-pix "$gated_mumap_orig" "${PET_dir_skull}/${subj}/PET/gated_muMAP.nii" && gzip "$gated_mumap"
+            [[ ! -f "$gated_mumap" ]] && mri_convert --left-right-reverse-pix "$gated_mumap_orig" "${PET_dir_skull}/${subj}/PET/gated_muMAP.nii" && gzip "${PET_dir_skull}/${subj}/PET/gated_muMAP.nii"
         else
             echo -e "\e[31mBay6 PET map file missing for subject $subj.\e[0m"
             echo "${subj}" >> "$PET_dir_skull/subject_no_bay6_file.txt"
@@ -60,17 +60,19 @@ copy_mu_map_for_bayX() {
     fi
 
     # Perform common thresholding and binarization for both Bay7 and Bay6
-    local binarized_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN.nii.gz"
-    local tmp_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_dilated.nii.gz"
+    local binarized_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz"
+    local final_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN.nii.gz"
+    #local tmp_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_dilated.nii.gz"
 
     if [[ ! -f "$binarized_file" ]]; then
         echo "Performing thresholding and binarization..."
-        fslmaths "$gated_mumap" -thr 0.13 -bin "${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz"
+        fslmaths "$gated_mumap" -thr 0.13 -bin "$binarized_file"
         
         echo "Applying dilation and erosion..."
-        mri_binarize --i "${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz" --min 0.5 --dilate 1 --o "$tmp_file"
-        mri_binarize --i "$tmp_file" --min 0.5 --erode 1 --o "$binarized_file"
-        rm "$tmp_file"
+	fslmaths $binarized_file -fillh $final_file
+        #mri_binarize --i "${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz" --min 0.5 --dilate 1 --o "$tmp_file"
+        #mri_binarize --i "$tmp_file" --min 0.5 --erode 1 --o "$binarized_file"
+        #rm "$tmp_file"
     else
         echo "Thresholding and binarization already completed for $subj. Skipping."
     fi
