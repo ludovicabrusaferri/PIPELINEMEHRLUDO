@@ -1,6 +1,6 @@
 clear all
 % Set base paths
-scriptsPath = '/autofs/space/storm_002/users/MigPPG_2/data/PETdata/SKULL/FSL_analyses_ANTs_nativeNoBrain/Scripts';
+scriptsPath = '/autofs/space/storm_002/users/MigPPG_2/data/PETdata/SKULL/FSL_analyses_ANTs_nativeNoBrain/Scripts/PIPELINEMEHRLUDO/';
 cd(scriptsPath);
 subjectList = readlines(fullfile(pwd, 'list2.txt'));
 
