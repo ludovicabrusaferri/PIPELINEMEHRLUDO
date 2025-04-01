@@ -62,7 +62,7 @@ copy_mu_map_for_bayX() {
     # Perform common thresholding and binarization for both Bay7 and Bay6
     local binarized_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz"
     local final_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN.nii.gz"
-    #local tmp_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_dilated.nii.gz"
+    local tmp_file="${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_dilated.nii.gz"
 
     if [[ ! -f "$binarized_file" ]]; then
         echo "Performing thresholding and binarization..."
@@ -70,9 +70,9 @@ copy_mu_map_for_bayX() {
         
         echo "Applying dilation and erosion..."
 	fslmaths $binarized_file -fillh $final_file
-        #mri_binarize --i "${PET_dir_skull}/${subj}/PET/gated_muMAP_thr_BIN_tofill.nii.gz" --min 0.5 --dilate 1 --o "$tmp_file"
-        #mri_binarize --i "$tmp_file" --min 0.5 --erode 1 --o "$binarized_file"
-        #rm "$tmp_file"
+        mri_binarize --i "$final_file" --min 0.5 --dilate 1.5 --o "$tmp_file"
+        mri_binarize --i "$tmp_file" --min 0.5 --erode 1.5 --o "$final_file"
+        rm "$tmp_file"
     else
         echo "Thresholding and binarization already completed for $subj. Skipping."
     fi

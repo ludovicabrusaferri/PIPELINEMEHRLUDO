@@ -26,8 +26,8 @@ check_paths() {
         bay7="False"
 
      elif [[ "$subj" == *"ppg"*"hv"* ]]; then
-         datapath="/autofs/space/storm_001/users/migPPG/data/PETdata"
-	 fs_dir="/autofs/space/storm_001/users/migPPG/data/fs"
+         datapath="/autofs/space/storm_002/users/MigPPG_2/data/PETdata"
+	 fs_dir="/autofs/space/storm_002/users/MigPPG_2/data/fs"
         bay7="False"
 
     else
