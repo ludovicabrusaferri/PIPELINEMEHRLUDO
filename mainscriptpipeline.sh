@@ -12,7 +12,7 @@ echo "Current Directory: $PWD"
 
 # Ensure all utility scripts exist before sourcing
 UTIL_DIR="$subjlistpath/utility"
-for script in checkpaths.sh checkfiles.sh cp_pet.sh suv_convert.sh copy_suv_for_bay6.sh copy_mu_map_for_bayX.sh process_files.sh process_nativ_mu.sh register_T1_to_MNI.sh apply_ants_transform_mumap.sh apply_ants_transform_suv.sh makecope_suv_mni_5mm.sh ; do
+for script in checkpaths.sh checkfiles.sh cp_pet.sh suv_convert.sh copy_suv_for_bay6.sh copy_mu_map_for_bayX.sh process_files.sh process_nativ_mu.sh register_T1_to_MNI.sh apply_ants_transform_mumap.sh apply_ants_transform_suv.sh makecope_suv_mni_5mm.sh qcstep.sh; do
     [[ -f "$UTIL_DIR/$script" ]] || { echo -e "\e[31mError: $script not found in utility directory\e[0m"; exit 1; }
     source "$UTIL_DIR/$script"
 done
@@ -53,13 +53,15 @@ while IFS= read -r subj; do
     apply_ants_transform_mumap "$subj" "$PET_dir_skull"
     # STEP 7 ===========  Apply ANTs transformation to Skull SUV
     apply_ants_transform_suv "$subj" "$PET_dir_skull"
-    # STEP 8 ====== Apply 5mm Gaussian smoothing and process Skull SUV in MNI space
+    # STEP 8 ===========
+    qcstep "$subj" "$PET_dir_skull"
+    # STEP 9 ====== Apply 5mm Gaussian smoothing and process Skull SUV in MNI space
     makecope_suv_mni_5mm "$subj" "$PET_dir_skull"
 
 
 
     echo "---------------------------------"
-done < "${subjlistpath}/list.txt"
+done < "${subjlistpath}/list2.txt"
 
-echo -e "\e[32mProcessing completed for all subjects in list.txt.\e[0m"
+echo -e "\e[32mProcessing completed for all subjects in list2.txt.\e[0m"
 
